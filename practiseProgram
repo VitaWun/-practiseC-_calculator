@@ -1,0 +1,127 @@
+using System;
+using System.Collections.Generic;
+
+namespace practiseProgram
+{
+    class Program
+    {
+        static Program instance = new Program();
+
+        List<int> calculateValue = new List<int>();
+        List<byte> inputValue = new List<byte>();
+        static List<string> symbol = new List<string>();
+
+        static void Main(string[] args)
+        {
+
+             ConsoleKeyInfo cki;            
+             do
+             {
+                 cki = Console.ReadKey(true);
+
+                 if (cki.Key != ConsoleKey.NoName)
+                 {
+                     //96~105為 ConsoleKey.NumPad0 ~ ConsoleKey.NumPad9
+                     if (((int)cki.Key) >= 96 && ((int)cki.Key) <= 105)
+                     {
+                         instance.InputKey(cki.Key);                         
+                     }
+                     else if (cki.Key == ConsoleKey.Add //加
+                         || cki.Key == ConsoleKey.Subtract //減
+                         || cki.Key == ConsoleKey.Multiply //乘
+                         || cki.Key == ConsoleKey.Divide) //除
+                     {
+                        if (cki.Key == ConsoleKey.Add)
+                            symbol.Add( "+");
+                        
+                        if (cki.Key == ConsoleKey.Subtract)
+                            symbol.Add( "-");
+                        
+                        if (cki.Key == ConsoleKey.Multiply)
+                            symbol.Add( "*");
+
+                        if (cki.Key == ConsoleKey.Divide)                            
+                            symbol.Add( "/");
+
+                        Console.Write(symbol[symbol.Count-1]);
+                        instance.InputCalculate();
+                     }
+                     else if (cki.Key == ConsoleKey.Enter)
+                     {
+                        instance.InputCalculate();
+                        instance.CalculateSum();
+                     }
+                     else
+                     {
+                         Console.WriteLine("請按數字鍵");
+                     }                    
+                 }
+             } 
+             while (cki.Key != ConsoleKey.Escape);        
+           
+        }
+
+        void InputKey(ConsoleKey inputKey)
+        {
+            //計算輸入的數字值
+            byte x = (byte)(((int)inputKey) - 96);
+            inputValue.Add(x);
+            Console.Write(x);
+        }
+
+        //計算輸入的數
+        void InputCalculate()
+        {           
+            if (symbol.Count == calculateValue.Count && inputValue.Count<=0)
+            {
+                symbol.RemoveAt(symbol.Count-1);
+                inputValue.Clear();
+                return;
+            }
+
+            int _inputValue = 0;
+            for (int i = inputValue.Count-1 ; i>=0;i--)
+            {                
+                int carry = 1;
+                for (int n =0 ;n< ((inputValue.Count-1) - i) ;n++)
+                {
+                    carry = carry * 10;
+                }
+                _inputValue += inputValue[i]*carry;
+            }
+            calculateValue.Add(_inputValue);
+            inputValue.Clear();
+            //Console.WriteLine("你輸入的是: "+ _inputValue);
+        }
+
+        void CalculateSum()
+        {
+            Console.WriteLine("");
+            Console.WriteLine("計算中...");
+            int _sum = calculateValue[0];
+            for (int i = 1 ; i < calculateValue.Count ; i++)
+            {
+                //Console.Write(_sum + symbol[i-1] + "=" + calculateValue[i]);
+                if (symbol[i - 1] == "+")
+                    _sum += calculateValue[i];
+                else if (symbol[i - 1] == "-")
+                    _sum -= calculateValue[i];
+                else if (symbol[i - 1] == "*")
+                    _sum *= calculateValue[i];
+                else if (symbol[i - 1] == "/")
+                    _sum /= calculateValue[i];
+
+            }
+
+            Console.WriteLine("總和 :" + _sum);
+            Init();
+        }
+
+        void Init()
+        {
+            calculateValue.Clear();
+            symbol.Clear();
+            inputValue.Clear();
+        }
+    }
+}
